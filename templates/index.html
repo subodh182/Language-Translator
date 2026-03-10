@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LinguaFlow — AI Language Translator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- Background orbs -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="grain"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">LinguaFlow</span>
+    </div>
+    <nav class="nav-pills">
+      <span class="pill active">Translate</span>
+      <span class="pill" onclick="showInfo()">About</span>
+    </nav>
+    <div class="header-badge">
+      <span class="dot"></span> 100+ Languages
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-tag">Powered by Neural Translation</div>
+    <h1 class="hero-title">Break Every<br><em>Language Barrier</em></h1>
+    <p class="hero-sub">Instant, accurate translation across 100+ languages with a single click.</p>
+  </section>
+
+  <!-- Main Translator Card -->
+  <main class="translator-wrap">
+    <div class="translator-card">
+
+      <!-- Language Selector Row -->
+      <div class="lang-row">
+        <div class="lang-select-wrap">
+          <label>From</label>
+          <div class="custom-select">
+            <select id="sourceLang">
+              <option value="auto">Detect Language</option>
+              {% for code, name in languages.items() %}
+              <option value="{{ code }}" {% if code == 'en' %}selected{% endif %}>{{ name }}</option>
+              {% endfor %}
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+        </div>
+
+        <button class="swap-btn" id="swapBtn" title="Swap languages">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M7 16V4m0 0L3 8m4-4l4 4"/>
+            <path d="M17 8v12m0 0l4-4m-4 4l-4-4"/>
+          </svg>
+        </button>
+
+        <div class="lang-select-wrap">
+          <label>To</label>
+          <div class="custom-select">
+            <select id="targetLang">
+              {% for code, name in languages.items() %}
+              <option value="{{ code }}" {% if code == 'es' %}selected{% endif %}>{{ name }}</option>
+              {% endfor %}
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text Areas -->
+      <div class="panels">
+        <!-- Source Panel -->
+        <div class="panel panel-source">
+          <div class="panel-header">
+            <span class="panel-label">Source Text</span>
+            <div class="panel-actions">
+              <button class="action-btn" id="pasteBtn" title="Paste from clipboard">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="2" width="13" height="13" rx="2"/>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                </svg>
+                Paste
+              </button>
+              <button class="action-btn danger" id="clearBtn" title="Clear text">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Clear
+              </button>
+            </div>
+          </div>
+          <textarea id="sourceText" placeholder="Type or paste text here to translate..." maxlength="5000"></textarea>
+          <div class="panel-footer">
+            <span id="charCount">0 / 5000</span>
+            <button class="speak-btn" id="speakSource" title="Listen">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
+              </svg>
+              Listen
+            </button>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="panel-divider">
+          <div class="divider-line"></div>
+        </div>
+
+        <!-- Target Panel -->
+        <div class="panel panel-target">
+          <div class="panel-header">
+            <span class="panel-label">Translation</span>
+            <div class="panel-actions">
+              <button class="action-btn" id="copyBtn" title="Copy translation">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                </svg>
+                Copy
+              </button>
+            </div>
+          </div>
+          <div id="targetText" class="output-area">
+            <span class="placeholder-text">Translation will appear here...</span>
+          </div>
+          <div class="panel-footer">
+            <span id="targetInfo" class="target-info"></span>
+            <button class="speak-btn" id="speakTarget" title="Listen">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
+              </svg>
+              Listen
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Translate Button -->
+      <div class="translate-row">
+        <button class="translate-btn" id="translateBtn">
+          <span class="btn-text">Translate</span>
+          <span class="btn-icon">→</span>
+          <div class="btn-loader" id="btnLoader"></div>
+        </button>
+        <label class="auto-toggle">
+          <input type="checkbox" id="autoTranslate">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">Auto translate</span>
+        </label>
+      </div>
+
+      <!-- Error Banner -->
+      <div class="error-banner" id="errorBanner" style="display:none"></div>
+
+    </div>
+
+    <!-- Quick Language Chips -->
+    <div class="quick-langs">
+      <span class="quick-label">Quick pick:</span>
+      <button class="lang-chip" data-lang="fr">🇫🇷 French</button>
+      <button class="lang-chip" data-lang="de">🇩🇪 German</button>
+      <button class="lang-chip" data-lang="ja">🇯🇵 Japanese</button>
+      <button class="lang-chip" data-lang="ar">🇸🇦 Arabic</button>
+      <button class="lang-chip" data-lang="zh-CN">🇨🇳 Chinese</button>
+      <button class="lang-chip" data-lang="hi">🇮🇳 Hindi</button>
+      <button class="lang-chip" data-lang="pt">🇧🇷 Portuguese</button>
+      <button class="lang-chip" data-lang="ru">🇷🇺 Russian</button>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num">100+</div>
+        <div class="stat-desc">Languages</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">∞</div>
+        <div class="stat-desc">Translations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">&lt;1s</div>
+        <div class="stat-desc">Response Time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">Free</div>
+        <div class="stat-desc">Always</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Info Modal -->
+  <div class="modal-overlay" id="modalOverlay" onclick="hideInfo()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="hideInfo()">✕</button>
+      <div class="modal-icon">⬡</div>
+      <h2>About LinguaFlow</h2>
+      <p>LinguaFlow is a professional language translation web application built with Flask and powered by Google's neural translation engine.</p>
+      <ul>
+        <li>✦ 100+ supported languages</li>
+        <li>✦ Auto language detection</li>
+        <li>✦ Text-to-speech playback</li>
+        <li>✦ Real-time auto-translation</li>
+        <li>✦ One-click copy & paste</li>
+      </ul>
+      <p class="modal-footer-text">Built with Flask · Python · Vanilla JS</p>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
