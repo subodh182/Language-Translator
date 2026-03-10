@@ -45,7 +45,7 @@
       <!-- Language Selector Row -->
       <div class="lang-row">
         <div class="lang-select-wrap">
-          <label>From</label>
+          <label for="sourceLang">From</label>
           <div class="custom-select">
             <select id="sourceLang">
               <option value="auto">Detect Language</option>
@@ -65,9 +65,9 @@
         </button>
 
         <div class="lang-select-wrap">
-          <label>To</label>
+          <label for="targetLang">To</label>
           <div class="custom-select">
-            <select id="targetLang">
+            <select id="targetLang" name="targetLang" title="Target language" aria-label="Target language">
               {% for code, name in languages.items() %}
               <option value="{{ code }}" {% if code == 'es' %}selected{% endif %}>{{ name }}</option>
               {% endfor %}
@@ -161,7 +161,7 @@
       </div>
 
       <!-- Error Banner -->
-      <div class="error-banner" id="errorBanner" style="display:none"></div>
+      <div class="error-banner is-hidden" id="errorBanner"></div>
 
     </div>
 
